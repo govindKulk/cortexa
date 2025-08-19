@@ -2,9 +2,9 @@ import React from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { Surface, TextInput } from 'react-native-paper'
 import Animated, {
-    interpolateColor,
-    useAnimatedStyle,
-    withTiming
+  interpolateColor,
+  useAnimatedStyle,
+  withTiming
 } from 'react-native-reanimated'
 import { useColorScheme } from '../hooks/useColorScheme'
 
@@ -51,6 +51,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
+        borderRadius: 16
       }}
     >
       <View className="flex-row items-center p-3">
@@ -64,14 +65,16 @@ const SearchInput: React.FC<SearchInputProps> = ({
             contentStyle={{
               backgroundColor: 'transparent',
               color: isDark ? '#ffffff' : '#000000',
-              fontSize: 16,
-              paddingLeft: 8,
+              fontSize: 13,
+              paddingLeft: 4,
+              paddingRight: 0
             }}
             style={{
               backgroundColor: 'transparent',
               height: 48,
             }}
             placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
+            placeholderClassName='textinput-placeholder'
             onSubmitEditing={onSearch}
             editable={!disabled}
             multiline={false}

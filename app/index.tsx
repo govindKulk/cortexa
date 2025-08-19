@@ -1,26 +1,24 @@
-import React, { useState } from 'react'
+import usePaperTheme from '@/hooks/usePaperTheme'
+import React, { useEffect, useState } from 'react'
 import {
-    Dimensions,
-    FlatList,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    View
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StatusBar,
+  Text,
+  View
 } from 'react-native'
 import {
-    ActivityIndicator,
-    Button
+  ActivityIndicator
 } from 'react-native-paper'
 import Animated, {
-    interpolate,
-    runOnJS,
-    SlideInRight,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withSpring,
-    withTiming
+  interpolate,
+  SlideInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming
 } from 'react-native-reanimated'
 import ProductCard from '../components/ProductCard'
 import SearchInput from '../components/SearchInput'
@@ -36,101 +34,123 @@ const HomeScreen = () => {
   const [isSearching, setIsSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
-  
+
   // Animation values
-  const translateY = useSharedValue(0)
-  const opacity = useSharedValue(1)
-  const scale = useSharedValue(1)
+  const headerOpacity = useSharedValue(1)
+  const headerHeight = useSharedValue(1)
+  const searchInputPosition = useSharedValue(0) // 0 = center, 1 = top
   const welcomeOpacity = useSharedValue(0)
   const welcomeTranslateY = useSharedValue(50)
-  
-  React.useEffect(() => {
+
+  useEffect(() => {
     // Welcome animation on mount
     welcomeOpacity.value = withDelay(300, withTiming(1, { duration: 800 }))
     welcomeTranslateY.value = withDelay(300, withSpring(0, { damping: 15 }))
   }, [])
-  
+
   const isDark = colorScheme === 'dark'
-  
+
   const handleSearch = () => {
     if (!searchQuery.trim()) return
-    
-    // Animate input to top
-    translateY.value = withSpring(-SCREEN_HEIGHT * 0.3, {
-      damping: 15,
-      stiffness: 100,
-    })
-    
-    scale.value = withTiming(0.9, { duration: 300 })
-    
+
+    // Animate header out and search input to top
+    headerOpacity.value = withTiming(0, { duration: 300 })
+    headerHeight.value = withTiming(0, { duration: 300 })
+    searchInputPosition.value = withDelay(200, withTiming(1,{
+      duration: 300
+    }))
+
     // Start loading
-    runOnJS(setIsSearching)(true)
-    runOnJS(setShowResults)(true)
+    setIsSearching(true)
+    setShowResults(true)
     
     // Simulate API call delay
     setTimeout(() => {
-      runOnJS(setProducts)(catalogData.slice(0, 10)) // Show first 10 products
-      runOnJS(setIsSearching)(false)
+      setProducts(catalogData.slice(0, 10)) // Show first 10 products
+      setIsSearching(false)
     }, 2000)
   }
-  
+
   const handleReset = () => {
-    translateY.value = withSpring(0)
-    scale.value = withTiming(1)
+    headerOpacity.value = withTiming(1, { duration: 300 })
+    headerHeight.value = withTiming(1, { duration: 300 })
+    searchInputPosition.value = withSpring(0, { damping: 15, stiffness: 100 })
     setShowResults(false)
     setIsSearching(false)
     setProducts([])
     setSearchQuery('')
   }
-  
+
   const inputAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateY: translateY.value },
-        { scale: scale.value }
-      ],
+        { 
+          translateY: interpolate(
+            searchInputPosition.value,
+            [0, 1],
+            [0, -20] 
+          )
+        },
+        { 
+          scale: interpolate(
+            searchInputPosition.value,
+            [0, 1],
+            [1, 0.95]
+          )
+        }
+      ]
     }
   })
-  
+
   const welcomeAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: welcomeOpacity.value,
       transform: [{ translateY: welcomeTranslateY.value }],
     }
   })
-  
+
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateY.value,
-      [-SCREEN_HEIGHT * 0.3, 0],
-      [0, 1]
-    )
     return {
-      opacity,
+      opacity: headerOpacity.value,
+      transform: [{ 
+        scaleY: headerHeight.value 
+      }],
     }
   })
-  
+
+  const paperTheme = usePaperTheme();
+
   return (
-    <SafeAreaView className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <StatusBar 
+    <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? '#111827' : '#f9fafb'}
       />
-      
-      {/* Header */}
-      <Animated.View style={headerAnimatedStyle} className="px-6 pt-8 pb-4">
-        <Text className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          CortexA
-        </Text>
-        <Text className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-          AI-Powered Product Recommendations
-        </Text>
-      </Animated.View>
-      
-      {/* Search Input */}
-      <Animated.View 
+
+      {/* Header - Only show when not searching */}
+      {!showResults && (
+        <Animated.View style={headerAnimatedStyle} className="w-full py-8">
+          <Text className={`text-3xl font-bold text-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+            style={{ color: paperTheme.colors.primary }}
+          >
+            CortexA
+          </Text>
+          <Text
+            style={{
+              color: paperTheme.colors.secondary,
+              fontWeight: 'normal',
+              textAlign: 'center'
+            }}
+          >
+            AI-Powered Product Recommendations
+          </Text>
+        </Animated.View>
+      )}
+
+      {/* Search Input - Always visible but position changes */}
+      <Animated.View
         style={inputAnimatedStyle}
-        className="px-6 mb-6"
+        className={`px-6 ${showResults ? 'pt-8' : 'mb-6'}`}
       >
         <SearchInput
           value={searchQuery}
@@ -139,18 +159,9 @@ const HomeScreen = () => {
           disabled={isSearching}
         />
         
-        {showResults && (
-          <Button
-            mode="text"
-            onPress={handleReset}
-            className="mt-2"
-            textColor={isDark ? '#60a5fa' : '#3b82f6'}
-          >
-            New Search
-          </Button>
-        )}
-      </Animated.View>
       
+      </Animated.View>
+
       {/* Results Section */}
       {showResults && (
         <View className="flex-1">
@@ -162,7 +173,7 @@ const HomeScreen = () => {
                   AI is analyzing your request...
                 </Text>
               </View>
-              
+
               {/* Skeleton Loading Cards */}
               {[1, 2, 3, 4].map((index) => (
                 <SkeletonCard key={index} />
@@ -185,10 +196,10 @@ const HomeScreen = () => {
           )}
         </View>
       )}
-      
+
       {/* Welcome Message when no search */}
       {!showResults && (
-        <Animated.View 
+        <Animated.View
           style={welcomeAnimatedStyle}
           className="flex-1 justify-center items-center px-8"
         >
@@ -200,13 +211,13 @@ const HomeScreen = () => {
               Welcome to CortexA
             </Text>
             <Text className={`text-center leading-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Describe what you're looking for and let our AI find the perfect products for you. 
+              Describe what you're looking for and let our AI find the perfect products for you.
               Try asking for "smart home devices" or "fitness trackers".
             </Text>
           </View>
         </Animated.View>
       )}
-    </SafeAreaView>
+    </View>
   )
 }
 
