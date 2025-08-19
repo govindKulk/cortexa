@@ -6,7 +6,10 @@ import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 import "../global.css";
 
+import StackHeader from '@/components/StackHeader';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Custom themes
 const lightTheme = {
@@ -47,13 +50,23 @@ export default function RootLayout() {
   const paperTheme = colorScheme === 'dark' ? darkTheme : lightTheme;
   const navigationTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
 
+
   return (
     <PaperProvider theme={paperTheme}>
       <ThemeProvider value={navigationTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index"/>
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <SafeAreaView
+          className={`flex-1 w-full ${Platform.OS === 'web' && 'max-w-screen-sm mx-auto'}`}
+        >
+          <Stack screenOptions={{
+            header: (props) => <StackHeader options={props.options as {title: string}} />,
+          }} >
+            <Stack.Screen name="index" options={{
+              headerShown: false
+            }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+
+        </SafeAreaView>
         <StatusBar style="auto" />
       </ThemeProvider>
     </PaperProvider>
