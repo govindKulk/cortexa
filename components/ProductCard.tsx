@@ -1,4 +1,5 @@
 import usePaperTheme from '@/hooks/usePaperTheme'
+import { Product } from '@/types/types'
 import React from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { Card, Chip, Surface } from 'react-native-paper'
@@ -7,7 +8,6 @@ import Animated, {
   useSharedValue,
   withSpring
 } from 'react-native-reanimated'
-import { Product } from '../data/catalog'
 import { useColorScheme } from '../hooks/useColorScheme'
 
 interface ProductCardProps {
