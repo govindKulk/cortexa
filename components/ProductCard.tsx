@@ -25,7 +25,7 @@ const colors = {
   'Security & Surveillance': '#f97316'
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
   const scale = useSharedValue(1)
@@ -35,9 +35,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   }
 
   const getCategoryColor = (category: string) => {
-
     return colors[category as keyof typeof colors] || '#6b7280'
   }
+
 
   const handlePressIn = () => {
     scale.value = withSpring(0.98)
@@ -53,8 +53,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const paperTheme = usePaperTheme();
 
+
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[animatedStyle, { flex: 1 }]}>
       <Card
         className="mx-4 mb-4 overflow-hidden"
         mode="elevated"
@@ -69,11 +70,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           android_ripple={{ color: isDark ? '#4b5563' : '#f3f4f6' }}
           className="p-4"
         >
-          <View className="flex-row">
+          <View className="flex-row" style={{ minHeight: 120 }}>
             {/* Product Image Placeholder */}
             <Surface
               className="w-20 h-20 rounded-lg mr-4 items-center justify-center"
-              style={{ backgroundColor: getCategoryColor(product.category) + '20' }}
+              style={{ 
+                backgroundColor: getCategoryColor(product.category) + '20',
+                alignSelf: 'flex-start'
+              }}
             >
               <Text className="text-2xl">
                 {product.category === 'Healthtech and Wellness' && '🏥'}
@@ -88,60 +92,68 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </Surface>
 
             {/* Product Details */}
-            <View className="flex-1">
-              <View
-                className='flex-1 flex-row items-start justify-between'
-              >
-                <View className=" mb-2 flex-1">
-                  <Text
-                    className={`text-sm  font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} capitalize`}
+            <View className="flex-1" style={{ justifyContent: 'space-between' }}>
+              {/* Header with brand, product name and chip */}
+              <View>
+                <View className="flex-row items-start justify-between mb-2">
+                  <View className="flex-1 mr-2">
+                    <Text
+                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} capitalize`}
+                      style={{
+                        color: getCategoryColor(product.category)
+                      }}
+                      numberOfLines={1}
+                    >
+                      {product.brand}
+                    </Text>
+
+                    <Text
+                      className={`text-base font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                      numberOfLines={2}
+                      style={{ lineHeight: 20 }}
+                    >
+                      {product.product_name.split(' ').slice(0, 4).join(' ') + '...'}
+                    </Text>
+                  </View>
+
+                  <Chip
+                    mode="flat"
+                    compact
+                    textStyle={{ fontSize: 10 }}
                     style={{
-                      color: getCategoryColor(product.category)
+                      backgroundColor: getCategoryColor(product.category) + '20',
+                      alignSelf: 'flex-start'
                     }}
                   >
-                    {product.brand}
-                  </Text>
-
-                  <Text
-                    className={`text-base font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}
-                    numberOfLines={2}
-                  >
-                    {product.product_name}
-                  </Text>
+                    <Text style={{ color: getCategoryColor(product.category), fontSize: 10 }}>
+                      {product.category.split(' ')[0]}
+                    </Text>
+                  </Chip>
                 </View>
-                <Chip
-                  mode="flat"
-                  compact
-                  textStyle={{ fontSize: 10 }}
-                  style={{
-                    backgroundColor: getCategoryColor(product.category) + '20',
-                  }}
-                >
-                  <Text style={{ color: getCategoryColor(product.category), fontSize: 10 }}>
-                    {product.category.split(' ')[0]}
-                  </Text>
-                </Chip>
 
+                <Text
+                  className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                  style={{ color: paperTheme.colors.secondary, lineHeight: 18 }}
+                  numberOfLines={2}
+                >
+                  {product.description}
+                </Text>
               </View>
 
-
-
-              <Text
-                className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
-                numberOfLines={2}
-                style={{
-                  color: paperTheme.colors.secondary
-                }}
-              >
-                {product.description}
-              </Text>
-
-              <View className="flex-row items-center justify-between">
+              {/* Footer with price and button */}
+              <View className="flex-row items-center justify-between mt-4">
                 <Text className={`text-lg font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
                   {formatPrice(product.price)}
                 </Text>
 
-
+                <Pressable
+                  className="bg-blue-600 px-4 py-2 rounded-lg overflow-hidden"
+                  android_ripple={{ color: '#1d4ed8' }}
+                >
+                  <Text className="text-white text-sm font-medium rounded-lg">
+                    View Details
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -149,6 +161,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </Card>
     </Animated.View>
   )
-}
+})
 
 export default ProductCard
