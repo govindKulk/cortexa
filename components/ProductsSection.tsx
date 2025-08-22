@@ -1,13 +1,16 @@
-import { Product } from '@/types/types';
+import { Recommendation } from '@/types/types';
 import React, { useMemo, useState } from 'react';
 import { FlatList, ScrollView, Text, useColorScheme, View } from 'react-native';
 import {
     ActivityIndicator
 } from 'react-native-paper';
-import Animated, { SlideInRight } from 'react-native-reanimated';
+import Animated, {
+    SlideInRight
+} from 'react-native-reanimated';
 import FilterSortBar from '../components/FilterSortBar';
 import ProductCard from '../components/ProductCard';
 import SkeletonCard from '../components/SkeletonCard';
+import WhyModal from '../components/WhyModal';
 import {
     extractBrands,
     extractCategories,
@@ -21,8 +24,9 @@ import {
 const ProductsSection = ({
     isSearching,
     products
-} : { isSearching: boolean, products: Product[] }) => {
+}: { isSearching: boolean, products: Recommendation[] }) => {
 
+    
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
     
@@ -33,12 +37,23 @@ const ProductsSection = ({
         brands: []
     }));
     const [sortOption, setSortOption] = useState<SortOption>('price-low-high');
+    const [showWhyModal, setShowWhyModal] = useState<Recommendation | null>(null);
+
+    // Show modal
+    const showModal = (product: Recommendation) => {
+        setShowWhyModal(product);
+    };
+
+    // Hide modal
+    const hideModal = () => {
+        setShowWhyModal(null);
+    };
     
     // Extract available options from products - only when products change
     const availableCategories = useMemo(() => extractCategories(products), [products]);
     const availableBrands = useMemo(() => extractBrands(products), [products]);
     const priceRange = useMemo(() => extractPriceRange(products), [products]);
-    
+
     // Update filters when products change
     React.useEffect(() => {
         if (products.length > 0) {
@@ -49,18 +64,18 @@ const ProductsSection = ({
             }));
         }
     }, [products]);
-    
+
     // Apply filters and sorting - stable reference
     const processedProducts = useMemo(() => {
         if (products.length === 0) return [];
         const filtered = filterProducts(products, filters);
         return sortProducts(filtered, sortOption);
     }, [products, filters, sortOption]);
-    
+
     const handleFilterChange = React.useCallback((newFilters: FilterOptions) => {
         setFilters(newFilters);
     }, []);
-    
+
     const handleSortChange = React.useCallback((newSort: SortOption) => {
         setSortOption(newSort);
     }, []);
@@ -95,28 +110,38 @@ const ProductsSection = ({
                             currentSort={sortOption}
                         />
                     )}
-                    
+
                     {/* Results Count */}
                     {products.length > 0 && (
-                        <View className="px-6 py-2">
+                        <View className="px-6 py-2 ">
                             <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Showing {processedProducts.length} of {products.length} products
                             </Text>
                         </View>
                     )}
-                    
+
+                    {/* Why Modal */}
+                    <WhyModal 
+                        product={showWhyModal}
+                        isVisible={!!showWhyModal}
+                        onClose={hideModal}
+                    />
+
                     {/* Products List */}
                     <FlatList
+
                         data={processedProducts}
                         keyExtractor={(item, index) => `${item.brand}-${item.product_name}-${index}`}
                         renderItem={({ item, index }) => (
-                         <Animated.View
-                            entering={SlideInRight.delay(index * 100).springify()}
-                        >
-                            <ProductCard product={item} />
-                        </Animated.View>   
-                            
+                            <Animated.View
+                                className='md:my-2'
+                                entering={SlideInRight.delay(index * 100).springify()}
+                            >
+                                <ProductCard product={item} setWhyModal={showModal} />
+                            </Animated.View>
+
                         )}
+
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ paddingBottom: 20 }}
                         removeClippedSubviews={false}

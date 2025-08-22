@@ -1,5 +1,5 @@
 import usePaperTheme from '@/hooks/usePaperTheme'
-import { Product } from '@/types/types'
+import { Recommendation } from '@/types/types'
 import React, { useEffect, useState } from 'react'
 import {
   Dimensions,
@@ -19,7 +19,8 @@ import Animated, {
 import SearchInput from '../components/SearchInput'
 
 import ProductsSection from '@/components/ProductsSection'
-import { getCategories, getRecommendations } from '@/services/llmService'
+import { mockRecomendations } from '@/data/catalog'
+import { Divider } from 'react-native-paper'
 import { useColorScheme } from '../hooks/useColorScheme'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
@@ -29,7 +30,7 @@ const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Recommendation[]>([])
 
   // Animation values
   const headerOpacity = useSharedValue(1)
@@ -46,43 +47,41 @@ const HomeScreen = () => {
 
   const isDark = colorScheme === 'dark'
 
-  const handleSearch = async  () => {
+  const handleSearch = async () => {
     if (!searchQuery.trim()) return
 
     // Animate header out and search input to top
     headerOpacity.value = withTiming(0, { duration: 300 })
     headerHeight.value = withTiming(0, { duration: 300 })
-    searchInputPosition.value = withDelay(200, withTiming(1, {
-      duration: 300
+    searchInputPosition.value = withDelay(300, withTiming(1, {
+      duration: 500
     }))
-
+ 
+    
     // Start loading
     setIsSearching(true)
     setShowResults(true)
 
-    const categories = await getCategories(searchQuery);
-    console.log("Categories: ", categories)
+    // const categories = await getCategories(searchQuery);
+    // console.log("Categories: ", categories)
 
-    const recommendations = await getRecommendations(searchQuery, categories);
-    console.log("Recommendations: ", recommendations)
+    // const recommendations = await getRecommendations(searchQuery, categories);
+    // console.log("Recommendations: ", recommendations)
 
-    setProducts(recommendations);
-    setShowResults(true);
-    setIsSearching(false);
+    // setProducts(recommendations);
+    // setShowResults(true);
+    // setIsSearching(false);
 
-   
+    setTimeout(() => {
+      setProducts(mockRecomendations);
+      setShowResults(true);
+      setIsSearching(false);
+    }, 2000)
+
+
   }
 
-  // const handleReset = () => {
-  //   headerOpacity.value = withTiming(1, { duration: 300 })
-  //   headerHeight.value = withTiming(1, { duration: 300 })
-  //   searchInputPosition.value = withSpring(0, { damping: 15, stiffness: 100 })
-  //   setShowResults(false)
-  //   setIsSearching(false)
-  //   setProducts([])
-  //   setSearchQuery('')
-  // }
-
+  // search-input animation styles
   const inputAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -104,6 +103,7 @@ const HomeScreen = () => {
     }
   })
 
+  // welcome animation styles
   const welcomeAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: welcomeOpacity.value,
@@ -111,6 +111,7 @@ const HomeScreen = () => {
     }
   })
 
+  // header animation styles
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: headerOpacity.value,
@@ -123,7 +124,7 @@ const HomeScreen = () => {
   const paperTheme = usePaperTheme();
 
   return (
-    <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} sm:px-2 md:px-4 lg:px-8 ${!showResults ? 'py-8' : 'py-0'}`}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? '#111827' : '#f9fafb'}
@@ -132,7 +133,7 @@ const HomeScreen = () => {
       {/* Header - Only show when not searching */}
       {!showResults && (
         <Animated.View style={headerAnimatedStyle} className="w-full py-8">
-          <Text className={`text-3xl font-bold text-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+          <Text className={`text-4xl font-bold text-center ${isDark ? 'text-white' : 'text-gray-900'}`}
             style={{ color: paperTheme.colors.primary }}
           >
             CortexA
@@ -152,7 +153,7 @@ const HomeScreen = () => {
       {/* Search Input - Always visible but position changes */}
       <Animated.View
         style={inputAnimatedStyle}
-        className={`px-6 ${showResults ? 'pt-8' : 'mb-6'}`}
+        className={`px-6 ${showResults ? 'pt-8' : 'py-4'}`}
       >
         <SearchInput
           value={searchQuery}
@@ -162,15 +163,20 @@ const HomeScreen = () => {
         />
 
 
+
       </Animated.View>
 
+    {showResults &&   <Divider
+      bold={true}
+      className='w-full bg-zinc-700 h-8'
+      />
+    }
       {/* Results Section */}
       {showResults && (
         <ProductsSection
           isSearching={isSearching}
           products={products}
         />
-
       )}
 
       {/* Welcome Message when no search */}

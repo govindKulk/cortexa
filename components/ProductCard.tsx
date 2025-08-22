@@ -1,8 +1,9 @@
 import usePaperTheme from '@/hooks/usePaperTheme'
-import { Product } from '@/types/types'
+import { Recommendation } from '@/types/types'
+import AntDesign from '@expo/vector-icons/AntDesign'
 import React from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { Card, Chip, Surface } from 'react-native-paper'
+import { Card, Chip } from 'react-native-paper'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -11,7 +12,8 @@ import Animated, {
 import { useColorScheme } from '../hooks/useColorScheme'
 
 interface ProductCardProps {
-  product: Product
+  product: Recommendation,
+  setWhyModal: (rec : Recommendation) => void
 }
 
 const colors = {
@@ -25,10 +27,11 @@ const colors = {
   'Security & Surveillance': '#f97316'
 }
 
-const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, setWhyModal }) => {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
   const scale = useSharedValue(1)
+  const buttonScale = useSharedValue(1)
 
   const formatPrice = (price: number) => {
     return `₹${price.toLocaleString('en-IN')}`
@@ -47,8 +50,20 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
     scale.value = withSpring(1)
   }
 
+  const handleButtonPressIn = () => {
+    buttonScale.value = withSpring(0.9)
+  }
+
+  const handleButtonPressOut = () => {
+    buttonScale.value = withSpring(1)
+  }
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+  }))
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }],
   }))
 
   const paperTheme = usePaperTheme();
@@ -70,16 +85,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
           android_ripple={{ color: isDark ? '#4b5563' : '#f3f4f6' }}
           className="p-4"
         >
-          <View className="flex-row" style={{ minHeight: 120 }}>
+          <View className="flex-row " style={{ minHeight: 120 }}>
             {/* Product Image Placeholder */}
-            <Surface
-              className="w-20 h-20 rounded-lg mr-4 items-center justify-center"
+            <View
               style={{ 
                 backgroundColor: getCategoryColor(product.category) + '20',
-                alignSelf: 'flex-start'
+                alignSelf: 'flex-start',
               }}
+             
+              className="w-20 h-20  rounded-lg mr-4 items-center justify-center"
             >
-              <Text className="text-2xl">
+              <Text className="text-2xl ">
                 {product.category === 'Healthtech and Wellness' && '🏥'}
                 {product.category === 'Personal Care' && '💄'}
                 {product.category === 'Entertainment' && '🎮'}
@@ -89,10 +105,10 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
                 {product.category === 'Smart Mobility' && '🛴'}
                 {product.category === 'Security & Surveillance' && '🔒'}
               </Text>
-            </Surface>
+            </View>
 
             {/* Product Details */}
-            <View className="flex-1" style={{ justifyContent: 'space-between' }}>
+            <View className="flex-1" style={{ justifyContent: 'space-between'}} >
               {/* Header with brand, product name and chip */}
               <View>
                 <View className="flex-row items-start justify-between mb-2">
@@ -146,14 +162,20 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
                   {formatPrice(product.price)}
                 </Text>
 
-                <Pressable
-                  className="bg-blue-600 px-4 py-2 rounded-lg overflow-hidden"
-                  android_ripple={{ color: '#1d4ed8' }}
-                >
-                  <Text className="text-white text-sm font-medium rounded-lg">
-                    View Details
-                  </Text>
-                </Pressable>
+                <Animated.View style={buttonAnimatedStyle}>
+                  <Pressable
+                    onPress={() => setWhyModal(product)}
+                    onPressIn={handleButtonPressIn}
+                    onPressOut={handleButtonPressOut}
+                    className=" px-4 py-2 rounded-lg overflow-hidden"
+                    android_ripple={{ color:  getCategoryColor(product.category) + '40' }}
+                    style={{
+                      backgroundColor: getCategoryColor(product.category) + '20'
+                    }}
+                  >
+                    <AntDesign name="questioncircle" size={24} color={getCategoryColor(product.category)} />
+                  </Pressable>
+                </Animated.View>
               </View>
             </View>
           </View>

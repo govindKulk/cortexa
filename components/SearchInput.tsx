@@ -54,7 +54,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         borderRadius: 16
       }}
     >
-      <View className="flex-row items-center p-3">
+      <View className="flex-row items-center px-3 py-2">
         <View className="flex-1 mr-3">
           <TextInput
             mode="flat"
@@ -74,7 +74,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
               height: 48,
             }}
             placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
-            placeholderClassName='textinput-placeholder'
             onSubmitEditing={onSearch}
             editable={!disabled}
             multiline={false}

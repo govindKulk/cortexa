@@ -1,4 +1,4 @@
-import { Product } from '@/types/types'
+import { Recommendation } from '@/types/types'
 
 export interface PriceRange {
   min: number
@@ -14,7 +14,7 @@ export interface FilterOptions {
 export type SortOption = 'price-low-high' | 'price-high-low' | 'date-newest' | 'date-oldest'
 
 // Extract unique categories from products
-export const extractCategories = (products: Product[]): string[] => {
+export const extractCategories = (products: Recommendation[]): string[] => {
   if (!products || products.length === 0) return []
   
   const categories = products.map(product => product.category)
@@ -22,7 +22,7 @@ export const extractCategories = (products: Product[]): string[] => {
 }
 
 // Extract unique brands from products
-export const extractBrands = (products: Product[]): string[] => {
+export const extractBrands = (products: Recommendation[]): string[] => {
   if (!products || products.length === 0) return []
   
   const brands = products.map(product => product.brand)
@@ -30,7 +30,7 @@ export const extractBrands = (products: Product[]): string[] => {
 }
 
 // Extract price range from products
-export const extractPriceRange = (products: Product[]): PriceRange => {
+export const extractPriceRange = (products: Recommendation[]): PriceRange => {
   if (!products || products.length === 0) {
     return { min: 0, max: 1000 }
   }
@@ -43,7 +43,7 @@ export const extractPriceRange = (products: Product[]): PriceRange => {
 }
 
 // Filter products based on filter options
-export const filterProducts = (products: Product[], filters: FilterOptions): Product[] => {
+export const filterProducts = (products: Recommendation[], filters: FilterOptions): Recommendation[] => {
   if (!products || products.length === 0) return []
   
   return products.filter(product => {
@@ -64,7 +64,7 @@ export const filterProducts = (products: Product[], filters: FilterOptions): Pro
 }
 
 // Sort products based on sort option
-export const sortProducts = (products: Product[], sortOption: SortOption): Product[] => {
+export const sortProducts = (products: Recommendation[], sortOption: SortOption): Recommendation[] => {
   if (!products || products.length === 0) return []
   
   const sortedProducts = [...products]
@@ -88,7 +88,7 @@ export const sortProducts = (products: Product[], sortOption: SortOption): Produ
 }
 
 // Get default filter options based on products
-export const getDefaultFilterOptions = (products: Product[]): FilterOptions => {
+export const getDefaultFilterOptions = (products: Recommendation[]): FilterOptions => {
   const priceRange = extractPriceRange(products)
   
   return {

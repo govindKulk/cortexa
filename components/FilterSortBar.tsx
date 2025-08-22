@@ -90,7 +90,7 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
     }
 
     return (
-        <View className="flex-row justify-between items-center px-6 py-3 bg-transparent">
+        <View className="flex-row relative justify-between md:justify-start md:gap-2 items-center px-6 py-3 bg-transparent">
 
 
             {/* Filter Button */}
@@ -99,7 +99,6 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
                 mode="outlined"
                 onPress={() => setFilterMenuVisible(true)}
                 icon="filter-variant"
-                className="flex-1 mr-2"
                 style={{
                     borderColor: isDark ? '#60a5fa' : '#3b82f6',
                     backgroundColor: 'transparent'
@@ -108,9 +107,12 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
                     color: isDark ? '#60a5fa' : '#3b82f6',
                     fontSize: 14
                 }}
+                className="flex-1 mr-2"
+
             >
                 Filter {getActiveFilterCount() > 0 && `(${getActiveFilterCount()})`}
             </Button>
+
 
             {/* Sort Button */}
             <Button
