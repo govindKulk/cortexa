@@ -1,50 +1,41 @@
-# Welcome to your Expo app 👋
+# Cortexa — Personalized Product Recommendations (React Native + Gemini)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple assignment project that showcases on-device LLM-powered product recommendations with a clean UX.
 
-## Get started
+## What it does
+- Uses Gemini LLM on the client (for development/demo).
+- Explains the “why” behind each recommendation via a WhyModal.
+- Smooth UI/UX with React Native Reanimated animations.
+- Filters and sorting to refine results.
 
-1. Install dependencies
+## How it works (short)
+- Token optimization: Two-step flow
+  1) Send user query to Gemini to get relevant categories.
+  2) Send only catalog chunks matching those categories for the final recommendation call.
+- Production notes:
+  - Add a small server layer to secure keys, enforce rate limits, log usage, and orchestrate prompts.
+  - Consider a RAG setup (embeddings + vector DB) for scalable, accurate retrieval over large catalogs.
 
-   ```bash
-   npm install
-   ```
+## Install
+Prereqs: Node.js, Expo, iOS/Android simulator or device.
 
-2. Start the app
+1) Clone the repo:
+   - git clone https://github.com/govindKulk/cortexa && cd cortexa
+2) Install deps:
+   - npm install (or yarn / pnpm)
+3) Environment:
+   - Copy .env.example to .env
+   - Set your key:
+     - expo_public_gemini_api_key=YOUR_GEMINI_KEY
 
-   ```bash
-   npx expo start
-   ```
+## Run
+- npx expo start
+- Press i for iOS simulator, a for Android, or scan QR with Expo Go.
 
-In the output, you'll find options to open the app in a
+## Demo
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Notes
+- Client-side key is fine for this assignment/demo. For production, move LLM calls server-side and consider RAG.
+- Built with React Native + Expo + TypeScript + React Native Reanimated.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
