@@ -19,7 +19,7 @@ import Animated, {
 import SearchInput from '../components/SearchInput'
 
 import ProductsSection from '@/components/ProductsSection'
-import { mockRecomendations } from '@/data/catalog'
+import { getCategories, getRecommendations } from '@/services/llmService'
 import { Divider } from 'react-native-paper'
 import { useColorScheme } from '../hooks/useColorScheme'
 
@@ -62,21 +62,21 @@ const HomeScreen = () => {
     setIsSearching(true)
     setShowResults(true)
 
-    // const categories = await getCategories(searchQuery);
-    // console.log("Categories: ", categories)
+    const categories = await getCategories(searchQuery);
+    console.log("Categories: ", categories)
 
-    // const recommendations = await getRecommendations(searchQuery, categories);
-    // console.log("Recommendations: ", recommendations)
+    const recommendations = await getRecommendations(searchQuery, categories);
+    console.log("Recommendations: ", recommendations)
 
-    // setProducts(recommendations);
-    // setShowResults(true);
-    // setIsSearching(false);
+    setProducts(recommendations);
+    setShowResults(true);
+    setIsSearching(false);
 
-    setTimeout(() => {
-      setProducts(mockRecomendations);
-      setShowResults(true);
-      setIsSearching(false);
-    }, 2000)
+    // setTimeout(() => {
+    //   setProducts(mockRecomendations);
+    //   setShowResults(true);
+    //   setIsSearching(false);
+    // }, 2000)
 
 
   }
