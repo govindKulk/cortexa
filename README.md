@@ -1,4 +1,4 @@
-# Cortexa — Personalized Product Recommendations (React Native + Gemini)
+# Cortexa — Personalized Product Recommendations. (React Native)
 
 A simple assignment project that showcases on-device LLM-powered product recommendations with a clean UX.
 
@@ -33,6 +33,7 @@ Prereqs: Node.js, Expo, iOS/Android simulator or device.
 - Press i for iOS simulator, a for Android, or scan QR with Expo Go.
 
 ## Demo
+[![Watch the video](https://img.youtube.com/vi/AAfpHQ14yT8/maxresdefault.jpg)](https://www.youtube.com/shorts/AAfpHQ14yT8)
 
 ## Notes
 - Client-side key is fine for this assignment/demo. For production, move LLM calls server-side and consider RAG.
